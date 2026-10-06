@@ -1,0 +1,15 @@
+# Validated baseline for reproducible dataset generation and CI.
+# Use: python -m pip install -c constraints-dev.txt -e '.[dev]'
+pillow==12.3.0
+pytest==9.1.1
+ruff==0.16.10
+build==1.6.1
+packaging==26.3
+pyproject_hooks==1.3.3
+iniconfig==2.3.0
+pluggy==1.6.0
+pygments==2.21.0
+# Python 3.10 backports used by the validated environment.
+tomli==2.4.1; python_version < "3.11"
+exceptiongroup==1.3.1; python_version < "3.11"
+typing-extensions==4.16.0; python_version < "3.11"

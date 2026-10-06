@@ -1,0 +1,20 @@
+name: Research contribution
+description: Propose an experiment, control or protocol improvement
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective and relevant source
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Acceptance criteria and validation
+      description: Specify what would count as success or falsification and any protocol changes.
+    validations:
+      required: true
+  - type: textarea
+    id: resources
+    attributes:
+      label: Compute and dependencies

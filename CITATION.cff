@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below and also cite the original WM-VLM paper."
+title: "OpenWM-VLM: deterministic datasets for an independent WM-VLM reproduction"
+type: software
+version: 0.1.0
+license: MIT
+abstract: "Experimental dataset groundwork. Model training, evaluation and causal controls are planned."
+authors:
+  - family-names: Jawed
+    given-names: Ahmed
+references:
+  - type: article
+    title: "WM-VLM: Probing Internal World Models for Interleaved Visual-Textual Reasoning"
+    authors:
+      - family-names: Zha
+        given-names: Yuheng
+      - family-names: Wang
+        given-names: Yilei
+      - family-names: Gao
+        given-names: Qiyue
+      - family-names: Chen
+        given-names: Junrong
+      - family-names: Wu
+        given-names: Yujia
+      - family-names: Lai
+        given-names: Zhengfeng
+      - family-names: Liu
+        given-names: Zhengzhong
+      - family-names: Xing
+        given-names: Eric P.
+    url: "https://arxiv.org/abs/2609.34826v1"
+    identifiers:
+      - type: other
+        value: "arXiv:2609.34826"

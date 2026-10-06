@@ -1,0 +1,18 @@
+{
+  "name": "tetris3d",
+  "dim": 3,
+  "seed": 20261006,
+  "canvas": 532,
+  "train_counts": [4, 5, 6],
+  "ood_counts": [7],
+  "heldout_fraction": 0.25,
+  "num_ref_pairs": 1,
+  "num_options": 4,
+  "splits": [
+    {"name": "train", "pool": "train", "n": 16000, "steps": [1, 2]},
+    {"name": "sc_id_test", "pool": "train", "n": 400, "steps": [1, 2]},
+    {"name": "c_id_test", "pool": "heldout", "n": 400, "steps": [1, 2]},
+    {"name": "ood_test", "pool": "ood", "n": 500, "steps": [1, 2]},
+    {"name": "depth3_test", "pool": "train", "n": 400, "steps": [3, 3], "extra": true}
+  ]
+}

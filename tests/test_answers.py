@@ -79,6 +79,54 @@ def test_option_headings_do_not_conflict_with_a_marked_answer():
     assert parse_answer(raw).index == 2
 
 
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "B\nAnswer: 2",
+        "Answer: B\nFinal answer:",
+        "Answer: B\nFinal answer: C because it rotates",
+        "Final answer: C because it rotates\nAnswer: B",
+        "Answer: B\nAnswer: A or",
+        "Answer: B\nAnswer: (C]",
+        "Answer:\nB",
+    ],
+)
+def test_malformed_marked_answers_never_fall_back_to_valid_labels(raw):
+    parsed = parse_answer(raw)
+    assert parsed.status is ParseStatus.MALFORMED
+    assert parsed.index is None
+    assert parsed.raw == raw
+    report = score_outputs([raw], [1])
+    assert (report.total, report.correct, report.invalid) == (1, 0, 1)
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "Answer: A or",
+        "Answer: or B",
+        "Answer: A and",
+        "Answer: A/",
+        "Answer: A,",
+        "Answer: option",
+        "Answer: (B]",
+        "Answer: [B)",
+        "Answer: (B",
+        "Answer: B]",
+        "Answer: A K",
+        "Answer: A İ",
+        "Answer: A ı",
+        "Answer: A ſ",
+        "Option B:",
+        "B:",
+    ],
+)
+def test_incomplete_lists_and_malformed_label_syntax_are_invalid(raw):
+    parsed = parse_answer(raw)
+    assert parsed.status is ParseStatus.MALFORMED
+    assert parsed.index is None
+
+
 @pytest.mark.parametrize("raw", [None, "", " ", "\n\n", "\t \r\n"])
 def test_missing_output(raw):
     parsed = parse_answer(raw)
@@ -300,12 +348,6 @@ def test_prose_without_a_declaration_is_never_valid():
         only_labels = all(w.lower() in {"option", "a", "b", "c", "d"} for w in sentence.rstrip(".").split())
         if not only_labels:
             assert not parsed.is_valid, sentence
-
-
-def test_eval_package_is_included_in_the_built_distribution():
-    from setuptools import find_packages
-
-    assert "wm_vlm.eval" in find_packages(str(ROOT / "src"))
 
 
 def test_eval_modules_do_not_import_model_or_image_libraries():

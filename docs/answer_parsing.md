@@ -33,11 +33,13 @@ Matching ignores case, surrounding whitespace, Markdown emphasis (`*`, `_`, back
 |---|---|---|
 | Marked declaration | `Answer: B`, `answer b`, `Final answer: (B)`, `The answer is B.`, `Correct answer: option b` | valid |
 | Bare label on its own line | `B`, `b`, `(B)`, `[B]`, `B.`, `B)`, `Option B` | valid |
-| Any other line | `Option A is wrong.`, `A because it rotates` | ignored as explanation |
+| Explanation without an answer marker | `Option A is wrong.`, `A because it rotates`, `Option A:` | ignored |
 
 Reasoning followed by a final declaration line is valid. Letters inside explanations are never extracted.
 
-Marked declarations take precedence. Bare labels count only when the output has no marked declaration, so headings such as `Option A:` in an explanation do not conflict with a final `Answer: C`.
+Marked declarations take precedence, including malformed declarations. A malformed answer-marked line invalidates the output instead of falling back to another label. For example, `B` followed by `Answer: 2`, and `Answer: B` followed by `Final answer: C because it rotates`, are malformed. Bare labels count only when no marked declaration is present. Option headings such as `Option A:` are not declarations.
+
+Choice lists must be complete and bracket pairs must match. `Answer: A or`, `Answer: A/`, and `Answer: (B]` are malformed. Complete multi-label lists remain ambiguous.
 
 Repeating the same single label in several declarations is valid.
 
@@ -48,7 +50,7 @@ Repeating the same single label in several declarations is valid.
 | `missing` | `None` or whitespace only | `None`, `""`, `"\n"` |
 | `ambiguous` | declarations name more than one label | `Answer: A or B`, `Answer: A, B`, `Answer: A` then `Answer: B`, `A` then `B` on separate lines |
 | `out_of_range` | the single declared label is a letter beyond the option count | `Answer: E` with four options |
-| `malformed` | no declaration was found | `I think it is probably B`, `A because it rotates`, `Answer: 2`, `Answer: AB` |
+| `malformed` | no declaration was found, or an answer-marked line has invalid syntax | `I think it is probably B`, `A because it rotates`, `Answer: 2`, `Answer: AB`, `Answer: A or` |
 
 A conflict takes priority over a range error. `Answer: A` followed by `Answer: E` is `ambiguous`.
 

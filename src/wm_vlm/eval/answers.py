@@ -16,12 +16,14 @@ A line is an *answer declaration* when it is one of:
 * a bare label on its own line: ``B``, ``b``, ``(B)``, ``[B]``, ``B.``, ``B)``,
   ``Option B``
 
-Every other line is treated as explanation and ignored, even when it contains
-option letters. Reasoning followed by a final declaration line is therefore valid.
+Lines without an answer marker or a bare declaration are treated as explanation
+and ignored, even when they contain option letters. Reasoning followed by a final
+declaration line is therefore valid.
 
-Marked declarations take precedence. Bare labels are used only when the output
-has no marked declaration, so headings such as ``Option A:`` in an explanation
-do not conflict with a final ``Answer: C``.
+Marked declarations take precedence, including malformed declarations. A broken
+``Answer:`` line invalidates the output rather than falling back to an earlier
+label. Bare labels are used only when there is no marked declaration. Option
+headings such as ``Option A:`` are not declarations.
 
 Failure statuses
 ----------------
@@ -30,7 +32,7 @@ Failure statuses
                   ``Answer: A or B``, ``Answer: A`` followed by ``Answer: B``,
                   or several bare labels on separate lines
 ``OUT_OF_RANGE``  the single declared label is a letter beyond the option count
-``MALFORMED``     no declaration was found
+``MALFORMED``     no declaration was found, or a marked declaration is malformed
 
 Repeating the same single label in several declarations is still valid.
 
@@ -53,9 +55,13 @@ MAX_OPTIONS = 26
 
 _LABELS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 _DECORATION = " \t*_`\"'"
-_SEPARATORS = re.compile(r"[\s,/&|]+")
-_FILLER = frozenset({"and", "or", "option", "options", "choice", "choices", "letter"})
-_LABEL_TOKEN = re.compile(r"[(\[]?([A-Za-z])[)\]]?[.:]?")
+_LABEL_BODY = r"(?a:\([A-Za-z]\)|\[[A-Za-z]\]|[A-Za-z]\)?)"
+_LABEL_ATOM = rf"(?:(?:options?|choices?|letters?)\s+)?{_LABEL_BODY}"
+_DECLARATION = re.compile(
+    rf"{_LABEL_ATOM}(?:(?:[\s,/&|]+|\s+(?:and|or)\s+){_LABEL_ATOM})*",
+    re.IGNORECASE,
+)
+_LABELS_IN_DECLARATION = re.compile(r"\b[A-Za-z]\b")
 _MARKER = re.compile(
     r"(?:the\s+)?(?:(?:final|correct)\s+)?answer\b\s*(?:is\b\s*)?[:=]?\s*(?P<rest>.*)",
     re.IGNORECASE,
@@ -91,22 +97,20 @@ class ParsedAnswer:
 
 
 def _declared_labels(line: str) -> tuple[list[str], bool] | None:
-    """Return ``(labels, marked)`` for a declaration line, or ``None`` for any other line."""
+    """Return labels and marker presence, retaining malformed marked lines.
+
+    An empty label list with a marker denotes malformed syntax. Only validated
+    declaration bodies are searched for labels, so prose is never extracted.
+    """
     text = line.strip(_DECORATION)
     marker = _MARKER.fullmatch(text)
     if marker is not None:
         text = marker.group("rest").strip(_DECORATION)
     text = text.rstrip(".!").strip(_DECORATION)
-    tokens = [t for t in _SEPARATORS.split(text) if t]
-    labels: list[str] = []
-    for token in tokens:
-        if token.lower() in _FILLER:
-            continue
-        match = _LABEL_TOKEN.fullmatch(token)
-        if match is None:
-            return None
-        labels.append(match.group(1).upper())
-    return (labels, marker is not None) if labels else None
+    if _DECLARATION.fullmatch(text) is None:
+        return ([], True) if marker is not None else None
+    labels = [label.upper() for label in _LABELS_IN_DECLARATION.findall(text)]
+    return labels, marker is not None
 
 
 def parse_answer(raw: str | None, num_options: int = DEFAULT_NUM_OPTIONS) -> ParsedAnswer:
@@ -131,9 +135,11 @@ def parse_answer(raw: str | None, num_options: int = DEFAULT_NUM_OPTIONS) -> Par
         return ParsedAnswer(raw, ParseStatus.MALFORMED)
     if any(len(labels) > 1 for labels in declarations):
         return ParsedAnswer(raw, ParseStatus.AMBIGUOUS)
-    distinct = {labels[0] for labels in declarations}
+    distinct = {labels[0] for labels in declarations if labels}
     if len(distinct) > 1:
         return ParsedAnswer(raw, ParseStatus.AMBIGUOUS)
+    if any(not labels for labels in declarations):
+        return ParsedAnswer(raw, ParseStatus.MALFORMED)
     index = _LABELS.index(next(iter(distinct)))
     if index >= num_options:
         return ParsedAnswer(raw, ParseStatus.OUT_OF_RANGE)

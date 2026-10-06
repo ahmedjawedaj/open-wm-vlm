@@ -28,6 +28,7 @@ ROOT_FILES = {
     "pyproject.toml",
 }
 PUBLIC_DOCS = {
+    "docs/answer_parsing.md",
     "docs/dataset_card.md",
     "docs/dataset_protocol.md",
     "docs/dataset_stats_tetris2d.md",

@@ -44,3 +44,4 @@ jobs:
           python -m venv "$RUNNER_TEMP/wheel-check"
           "$RUNNER_TEMP/wheel-check/bin/python" -m pip install -c constraints-dev.txt dist/*.whl
           "$RUNNER_TEMP/wheel-check/bin/python" -I -c "from wm_vlm.data.config import GENERATOR_VERSION; from wm_vlm.data.audit import audit_dataset; assert GENERATOR_VERSION == '2'"
+          "$RUNNER_TEMP/wheel-check/bin/python" -I -c "import sys; from wm_vlm.eval import parse_answer, score_outputs; assert 'PIL' not in sys.modules; assert parse_answer('Answer: B').index == 1; assert not parse_answer('B\nAnswer: 2').is_valid; assert score_outputs(['A', None], [0, 1]).accuracy == 0.5"

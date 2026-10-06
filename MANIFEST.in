@@ -2,7 +2,7 @@ include LICENSE CITATION.cff CONTRIBUTING.md CHANGELOG.md CODE_OF_CONDUCT.md SEC
 include Makefile constraints-dev.txt
 recursive-include configs *.json
 exclude docs/*.md
-include docs/dataset_card.md docs/dataset_protocol.md
+include docs/answer_parsing.md docs/dataset_card.md docs/dataset_protocol.md
 include docs/dataset_stats_tetris2d.md docs/dataset_stats_tetris3d.md
 recursive-include docs/assets *.png
 recursive-include scripts *.py

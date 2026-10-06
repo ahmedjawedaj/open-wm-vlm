@@ -49,6 +49,10 @@ Images are 532 × 532 RGB and rendered on demand. The 19 × 19 token grid is a t
 
 For ordinary inference, use only `sample['question']` and `wm_vlm.data.viz.question_images(sample, config.canvas)`. `actions`, `steps`, `states`, `answer` and `answer_label` contain supervision. `sample_sheet` includes ground-truth states and must not be passed to a baseline as the question image.
 
+## Evaluation utilities
+
+`wm_vlm.eval` parses multiple-choice model output strictly and scores it with invalid outputs counted as incorrect. It is provider-independent and CPU-only. See [answer parsing](docs/answer_parsing.md). No model is run by this repository and no benchmark scores are reported.
+
 ## Example
 
 The diagnostic sheet below shows the reference pair, query, supervised intermediate states, and options A–D from top to bottom. Correct option: D. The sheet includes supervision and is not an inference input.

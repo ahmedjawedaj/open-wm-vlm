@@ -41,3 +41,9 @@ def test_link_to_ignored_working_file_is_rejected():
 def test_public_document_links_allowed():
     files = {"README.md": b"[data](docs/dataset_card.md)", "docs/dataset_card.md": b"[home](../README.md)"}
     assert publication.check_files(files) == []
+
+
+def test_public_docs_are_listed_in_the_package_manifest():
+    manifest = (Path(__file__).resolve().parents[1] / "MANIFEST.in").read_text()
+    missing = [doc for doc in sorted(publication.PUBLIC_DOCS) if doc not in manifest]
+    assert missing == []

@@ -15,6 +15,10 @@ Initial experimental dataset and research groundwork. Training, checkpoints and 
 
 Version 1 uses the previous protocol. Version 2 hashes are intentionally different. Do not compare results across these versions as if they used the same benchmark.
 
+### Evaluation foundations
+
+- Add `wm_vlm.eval` with strict multiple-choice answer parsing and scoring. Ambiguous, out-of-range, malformed and missing outputs stay invalid, keep the raw output and count as incorrect in the denominator. See `docs/answer_parsing.md`.
+
 ### Repository standards
 
 Public contribution, conduct and security policies, CI, and explicit Git/package publication checks. Local plans and implementation handoffs are excluded from the public repository and distributions.
